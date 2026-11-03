@@ -6,6 +6,7 @@ use App\Models\MasterItem;
 use Illuminate\Http\Request;
 // use Illuminate\Support\Facades\Log;
 use App\Models\Category;
+use Illuminate\Support\Facades\Storage;
 
 class MasterItemsController extends Controller
 {
@@ -85,29 +86,9 @@ class MasterItemsController extends Controller
         return view('master_items.single.index', $data);
     }
 
+    
     public function formSubmit(Request $request, $method, $id = 0)
     {
-        // if ($method == 'new') {
-        //     $data_item = new MasterItem;
-        //     $kode = MasterItem::count('id');
-        //     $kode = $kode + 1;
-        //     $kode = str_pad($kode, 5, '0', STR_PAD_LEFT);
-        //     sleep(3);
-        // } else {
-        //     $data_item = MasterItem::find($id);
-        //     $kode = $data_item->kode;
-        // }
-
-        // $data_item->nama = $request->nama;
-        // $data_item->harga_beli = $request->harga_beli;
-        // $data_item->laba = $request->laba;
-        // $data_item->kode = $kode;
-        // $data_item->supplier = $request->supplier;
-        // $data_item->jenis = $request->jenis;
-        // $data_item->save();
-
-        // return redirect('master-items');
-
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
             'harga_beli' => 'required|integer|min:0',
@@ -116,6 +97,7 @@ class MasterItemsController extends Controller
             'jenis' => 'required|string',
             'categories' => 'nullable|array',
             'categories.*' => 'exists:categories,id',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         if ($method === 'new') {
@@ -136,6 +118,17 @@ class MasterItemsController extends Controller
         $data_item->laba = $validated['laba'];
         $data_item->supplier = $validated['supplier'];
         $data_item->jenis = $validated['jenis'];
+
+        // Upload foto baru
+        if ($request->hasFile('foto')) {
+            // Hapus foto lama jika tersedia
+            if ($data_item->foto) {
+                Storage::disk('public')->delete($data_item->foto);
+            }
+
+            $data_item->foto = $request->file('foto')
+                ->store('master-items', 'public');
+        }
 
         $data_item->save();
 

@@ -1,4 +1,4 @@
-<form method="POST">
+<form method="POST" enctype="multipart/form-data">
     @csrf
     @if($method == 'edit')
     <div class="form-group">
@@ -84,6 +84,33 @@
             Gunakan Ctrl + klik untuk memilih beberapa kategori.
         </small>
     </div>
+
+    <div class="form-group">
+        <label for="foto">Foto Item</label>
+
+        <input
+            type="file"
+            name="foto"
+            id="foto"
+            class="form-control"
+            accept="image/jpeg,image/png,image/webp"
+        >
+
+        @error('foto')
+            <small class="text-danger">{{ $message }}</small>
+        @enderror
+
+        @if(isset($item) && $item->foto)
+            <div class="mt-2">
+                <img
+                    src="{{ asset('storage/' . $item->foto) }}"
+                    alt="Foto {{ $item->nama }}"
+                    width="120"
+                >
+            </div>
+        @endif
+    </div>
+
     <button class="btn btn-primary mt-3">Submit</button>
 
 </form>
