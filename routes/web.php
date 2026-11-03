@@ -35,3 +35,5 @@ Route::get('/master-items/update-random-data', [App\Http\Controllers\MasterItems
 
 Route::resource('categories', App\Http\Controllers\CategoryController::class)->except(['show']);
 Route::get('/categories/{category}', [App\Http\Controllers\CategoryController::class, 'show'])->name('categories.show');
+
+Route::get('/categories/{category}/pdf', [App\Http\Controllers\CategoryController::class, 'printPdf'])->name('categories.pdf');

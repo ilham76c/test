@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class CategoryController extends Controller
 {
@@ -92,5 +93,22 @@ class CategoryController extends Controller
         return redirect()
             ->route('categories.index')
             ->with('success', 'Kategori berhasil dihapus.');
+    }
+
+    public function printPdf(Category $category)
+    {
+        $category->load([
+            'items' => function ($query) {
+                $query->orderBy('nama');
+            }
+        ]);
+
+        $pdf = Pdf::loadView('categories.pdf', compact('category'));
+
+        $pdf->setPaper('A4', 'portrait');
+
+        return $pdf->stream(
+            'kategori-' . $category->code . '.pdf'
+        );
     }
 }

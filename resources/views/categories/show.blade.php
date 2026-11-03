@@ -12,6 +12,14 @@
            class="btn btn-warning">
             Edit Kategori
         </a>
+
+        <a
+            href="{{ route('categories.pdf', $category->id) }}"
+            class="btn btn-danger"
+            target="_blank"
+        >
+            Cetak PDF
+        </a>
     </div>
 
     <div class="card mb-3">
