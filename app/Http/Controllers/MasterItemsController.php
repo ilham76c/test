@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\MasterItem;
 use Illuminate\Http\Request;
 // use Illuminate\Support\Facades\Log;
+use App\Models\Category;
 
 class MasterItemsController extends Controller
 {
@@ -55,14 +56,27 @@ class MasterItemsController extends Controller
 
     public function formView($method, $id = 0)
     {
-        if ($method == 'new') {
-            $item = [];
+        // if ($method == 'new') {
+        //     $item = [];
+        // } else {
+        //     $item = MasterItem::find($id);
+        // }
+        // $data['item'] = $item;
+        // $data['method'] = $method;
+        // return view('master_items.form.index', $data);
+        if ($method === 'new') {
+            $item = new MasterItem();
         } else {
-            $item = MasterItem::find($id);
+            $item = MasterItem::with('categories')->findOrFail($id);
         }
-        $data['item'] = $item;
-        $data['method'] = $method;
-        return view('master_items.form.index', $data);
+
+        $categories = Category::orderBy('name')->get();
+
+        return view('master_items.form.index', [
+            'item' => $item,
+            'method' => $method,
+            'categories' => $categories,
+        ]);
     }
 
     public function singleView($kode)
@@ -73,24 +87,61 @@ class MasterItemsController extends Controller
 
     public function formSubmit(Request $request, $method, $id = 0)
     {
-        if ($method == 'new') {
-            $data_item = new MasterItem;
-            $kode = MasterItem::count('id');
-            $kode = $kode + 1;
-            $kode = str_pad($kode, 5, '0', STR_PAD_LEFT);
-            sleep(3);
+        // if ($method == 'new') {
+        //     $data_item = new MasterItem;
+        //     $kode = MasterItem::count('id');
+        //     $kode = $kode + 1;
+        //     $kode = str_pad($kode, 5, '0', STR_PAD_LEFT);
+        //     sleep(3);
+        // } else {
+        //     $data_item = MasterItem::find($id);
+        //     $kode = $data_item->kode;
+        // }
+
+        // $data_item->nama = $request->nama;
+        // $data_item->harga_beli = $request->harga_beli;
+        // $data_item->laba = $request->laba;
+        // $data_item->kode = $kode;
+        // $data_item->supplier = $request->supplier;
+        // $data_item->jenis = $request->jenis;
+        // $data_item->save();
+
+        // return redirect('master-items');
+
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'harga_beli' => 'required|integer|min:0',
+            'laba' => 'required|numeric|min:0',
+            'supplier' => 'required|string',
+            'jenis' => 'required|string',
+            'categories' => 'nullable|array',
+            'categories.*' => 'exists:categories,id',
+        ]);
+
+        if ($method === 'new') {
+            $data_item = new MasterItem();
+
+            $data_item->kode = str_pad(
+                ((int) MasterItem::withTrashed()->max('id')) + 1,
+                5,
+                '0',
+                STR_PAD_LEFT
+            );
         } else {
-            $data_item = MasterItem::find($id);
-            $kode = $data_item->kode;
+            $data_item = MasterItem::findOrFail($id);
         }
 
-        $data_item->nama = $request->nama;
-        $data_item->harga_beli = $request->harga_beli;
-        $data_item->laba = $request->laba;
-        $data_item->kode = $kode;
-        $data_item->supplier = $request->supplier;
-        $data_item->jenis = $request->jenis;
+        $data_item->nama = $validated['nama'];
+        $data_item->harga_beli = $validated['harga_beli'];
+        $data_item->laba = $validated['laba'];
+        $data_item->supplier = $validated['supplier'];
+        $data_item->jenis = $validated['jenis'];
+
         $data_item->save();
+
+        $data_item->categories()->sync(
+            $validated['categories'] ?? []
+        );
 
         return redirect('master-items');
     }

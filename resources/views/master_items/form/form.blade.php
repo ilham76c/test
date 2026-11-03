@@ -31,7 +31,7 @@
             <option @if($selected == 'Bukulapuk') selected @endif>Bukulapuk</option>
             <option @if($selected == 'TokoBagas') selected @endif>TokoBagas</option>
             <option @if($selected == 'E Commurz') selected @endif>E Commurz</option>
-            <optio @if($selected == 'Blublu') selected @endif>Blublu</option>
+            <option @if($selected == 'Blublu') selected @endif>Blublu</option>
         </select>
     </div>
 
@@ -48,6 +48,42 @@
         </select>
     </div>
 
+    <div class="form-group mt-3">
+        <label>Kategori Items</label>
+
+        @php
+            $selectedCategories = old(
+                'categories',
+                isset($item->id)
+                    ? $item->categories->pluck('id')->toArray()
+                    : []
+            );
+        @endphp
+
+        <select
+            name="categories[]"
+            class="form-control"
+            multiple
+            size="5"
+        >
+            @foreach($categories as $category)
+                <option
+                    value="{{ $category->id }}"
+                    @selected(in_array($category->id, $selectedCategories))
+                >
+                    {{ $category->name }} ({{ $category->code }})
+                </option>
+            @endforeach
+        </select>
+
+        @error('categories')
+            <div class="text-danger">{{ $message }}</div>
+        @enderror
+
+        <small class="text-muted">
+            Gunakan Ctrl + klik untuk memilih beberapa kategori.
+        </small>
+    </div>
     <button class="btn btn-primary mt-3">Submit</button>
 
 </form>
