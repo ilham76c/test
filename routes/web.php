@@ -37,3 +37,5 @@ Route::resource('categories', App\Http\Controllers\CategoryController::class)->e
 Route::get('/categories/{category}', [App\Http\Controllers\CategoryController::class, 'show'])->name('categories.show');
 
 Route::get('/categories/{category}/pdf', [App\Http\Controllers\CategoryController::class, 'printPdf'])->name('categories.pdf');
+
+Route::get('/master-items/export', [App\Http\Controllers\MasterItemsController::class, 'exportExcel'])->name('master-items.export');

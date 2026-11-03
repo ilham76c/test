@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use App\Models\Category;
 use Illuminate\Support\Facades\Storage;
 
+use App\Exports\MasterItemsExport;
+use Maatwebsite\Excel\Facades\Excel;
+
 class MasterItemsController extends Controller
 {
     public function index()
@@ -174,5 +177,13 @@ class MasterItemsController extends Controller
         $array = ['Obat','Alkes','Matkes','Umum','ATK'];
         $random = rand(0,4);
         return $array[$random];
+    }
+
+    public function exportExcel()
+    {
+        return Excel::download(
+            new MasterItemsExport(),
+            'master-items-' . now()->format('Ymd-His') . '.xlsx'
+        );
     }
 }
