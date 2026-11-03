@@ -6,48 +6,54 @@
 
 ## Installation
 
-1. Clone repository:
+### 1. Clone repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/ilham76c/test
 cd test
 ```
 
-2. Copy environment:
+### 2. Setup environment
 
 ```bash
 cp .env.example .env
 ```
 
-3. Jalankan container:
+Sesuaikan konfigurasi database pada `.env` dengan konfigurasi Docker Compose.
+
+### 3. Build and start containers
 
 ```bash
 docker compose up -d --build
 ```
 
-4. Install dependencies jika belum dijalankan otomatis oleh container:
+### 4. Install dependencies
 
 ```bash
 docker compose exec app composer install
 ```
 
-5. Generate application key:
+### 5. Generate application key
 
 ```bash
 docker compose exec app php artisan key:generate
 ```
 
-6. Jalankan migration:
+### 6. Run database migrations
 
 ```bash
-docker compose exec app php artisan migrate --seed
+docker compose exec app php artisan migrate --force
 ```
 
-7. Buat storage link:
+### 7. Create storage symbolic link
 
 ```bash
 docker compose exec app php artisan storage:link
 ```
+
+### 8. Access application
+
+http://localhost:8000
 
 ## Access Application
 
